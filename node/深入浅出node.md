@@ -1,4 +1,4 @@
-### 
+[TOC]
 
 # 深入浅出node.js
 
@@ -156,7 +156,7 @@ export.add = function() {
 
 ```javascript
 //program.js
-var math = require('math);
+var math = require('math');
 exports.increment = function(val) {
   return math.add(val, 1);
 };

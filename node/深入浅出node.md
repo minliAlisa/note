@@ -131,7 +131,7 @@ CPU密集型应用给Node带来的挑战主要是：由于JavaScript单线程的
 require()方法作为接受模块的标识，以此引入一个模块的api到当前上下文中。模块引用的示例代码如下：
 
 ```javascript
-var math = require('math);
+var math = require('math');
 ```
 
 ###### （2）模块定义：
@@ -254,4 +254,16 @@ define(['dep1', 'dep2'], function (dep1, dep2) {
 
 ### 第三章 异步I/O
 
-#### 
+#### 3.1现实的异步I/O:
+
+​	![image-20190125170857018](https://ws1.sinaimg.cn/large/006tNc79ly1fzj14nil83j30g00ai74v.jpg)
+
+#### 3.2 node的异步I/O:
+
+##### 3.2.1 node自身的执行模型 --- 事件循环。
+
+“在进程启动时，Node便会创建一个类似于while(true)的循环，每执行一次循环体的过程我们称为Tick。每个Tick的过程就是查看是否有事件待处理，如果有，就取出事件及其相关的回调函数。”“每个Tick的过程就是查看是否有事件待处理，如果有，就取出事件及其相关的回调函数。如果存在关联的回调函数，就执行它们。然后进入下个循环，如果不再有事件处理，就退出进程。”
+
+![image-20190125184928192](https://ws1.sinaimg.cn/large/006tNc79ly1fzj14mtgk0j30g00iv755.jpg)
+
+##### 3.2.2 

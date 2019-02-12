@@ -285,3 +285,57 @@ var forEach = function (list, callback) {
 ```
 
 对于node中的异步I/O调用而言，回调过程却不由开发者来调用。事实上，从javascript发起调用到内核执行完I/O操作的过渡过程中，存在一种中间产物，叫做请求对象。
+
+#### 3.3 非I/O的异步API
+
+node中存在一些与异步I/O无关的API，分别是 setTimeout() 、setInterval()、setImmediate()、process.nextTick()。
+
+##### 3.3.1 定时器
+
+setTimeout() 和setInterval() 与 浏览器中的API是一致的。分别用于单次和多次定时任务的执行。它们的实现原理与异步I/O比较类似，只是不需要I/O线程池的参与。setInterval()与之相同，区别在于后者是重复性的检测和执行。
+
+![image-20190212142022751](/Users/finup/Library/Application Support/typora-user-images/image-20190212142022751.png)
+
+##### 3.3.2 process.nextTick()
+
+由于事件循环自身的特点，定时器的精度不够。事实上，采用定时器需要用到红黑树，创建定时器对象和迭代等操作。比较浪费性能。事实上 process.nextTick() 方法的操作较为轻量，每次调用process.nextTick()方法，只会将回调函数放入队列中，在下一轮Tick中取出执行。定时器中采用红黑树的操作时间复杂度为O(lg(n))，nextTick()的时间复杂度为O(1)。相较之下，process.nextTick()更高效。
+
+##### 3.3.3 setImmediate()
+
+setImmediate()方法与process.nextTick() 方法十分类似，都是将回调函数延迟执行。
+
+```no
+process.nextTick(function () {
+  console.log('nextTick延迟执行');
+});
+setImmediate(function () {
+  console.log('setImmediate延迟执行');
+});
+console.log('正常执行');
+```
+
+其执行结果如下：
+
+```
+正常执行
+nextTick延迟执行
+setImmediate延迟执行
+```
+
+从结果可以看到， process.nextTick()中的回调函数执行的优先级要高于setImmediate()。这里的原因在于事件循环对观察者的检查是有先后顺序的，process.nextTick()属于idel观察者，setImmediate()属于check观察者。在每一个轮循环检查中idel观察者先与I/O观察者，I/O观察者先于check观察者。
+
+#### 3.4  事件驱动与高性能服务器
+
+![image-20190212144349792](/Users/finup/Library/Application Support/typora-user-images/image-20190212144349792.png)
+
+下面是几种典型的服务器模型，这里对比下他们的优缺点。
+
+（1）同步式。对于同步式的服务，一次只能处理一个请求，并且其余请求都处于等待状态。
+
+（2）每进程/每请求。为每个请求启动一个进程，这样可以处理多个请求，但是它不具备扩展性因为系统资源只有那么多。
+
+（3）每线程/每请求。为每个请求启动一个线程来处。尽管线程比进程要轻量，但是由于每个线程都占用一定的内存，当大量请求并发到来时，内存将会很快就耗光，导致服务器缓慢。
+
+每线程/每请求的方式目前还被Apache所采用。Node通过事件驱动的方式处理请求，无须为每一个请求创建额外的对应线程，可以省掉创建线程和销毁线程的开销，同时操作系统在调度任务时因为线程较少，上下文切换的代价很低。这使得服务器能够有条不紊地处理请求，即使在大量连接的情况下，也不受线程上下文切换开销的影响，这是Node高性能的一个原因。
+
+事件驱动带来的高效已经渐渐开始为业界所重视。知名服务器Nginx，也摒弃了多线程的方式，采用了和Node相同的事件驱动。如今，Nginx大有取代Apache之势。Node具有与Nginx相同的特性，不同之处在于Nginx采用纯C写成，性能较高，但是它仅适合于做Web服务器，用于反向代理或负载均衡等服务，在处理具体业务方面较为欠缺。Node则是一套高性能的平台，可以利用它构建与Nginx相同的功能，也可以处理各种具体业务，而且与背后的网络保持异步畅通。两者相比，Node没有Nginx在Web服务器方面那么专业，但场景更大，自身性能也不错。在实际项目中，我们可以结合它们各自优点，以达到应用的最优性能。

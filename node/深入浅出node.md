@@ -294,7 +294,7 @@ node中存在一些与异步I/O无关的API，分别是 setTimeout() 、setInter
 
 setTimeout() 和setInterval() 与 浏览器中的API是一致的。分别用于单次和多次定时任务的执行。它们的实现原理与异步I/O比较类似，只是不需要I/O线程池的参与。setInterval()与之相同，区别在于后者是重复性的检测和执行。
 
-![image-20190212142022751](/Users/finup/Library/Application Support/typora-user-images/image-20190212142022751.png)
+![image-20190212142022751](https://ws1.sinaimg.cn/large/006tNc79ly1g03noqzukgj30g90d0gmv.jpg)
 
 ##### 3.3.2 process.nextTick()
 
@@ -326,7 +326,7 @@ setImmediate延迟执行
 
 #### 3.4  事件驱动与高性能服务器
 
-![image-20190212144349792](/Users/finup/Library/Application Support/typora-user-images/image-20190212144349792.png)
+![image-20190212144349792](https://ws4.sinaimg.cn/large/006tNc79ly1g03noqo1ilj30fx0ctq48.jpg)
 
 下面是几种典型的服务器模型，这里对比下他们的优缺点。
 
